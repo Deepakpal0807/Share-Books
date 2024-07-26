@@ -1,0 +1,15 @@
+.App {
+  text-align: center;
+}
+
+.btn01{
+  height: 60px;
+  width: 180px;
+  font-size: 20px;
+  border-radius: 20px;
+  color: white;
+  font-family: poppins,sans-serif;
+  border: '2px solid #BF40BF';
+  background-color: #AD03DE;
+  cursor: pointer
+}
