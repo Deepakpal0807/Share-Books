@@ -9,9 +9,14 @@ const bookSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    genre: {
+        type: String,
+        required: true,
+    },
     description: {
         type: String,
-    }
+    },
+    users: [{type:mongoose.Schema.Types.ObjectId,ref:'users'}]
 })
 
 
