@@ -1,25 +1,63 @@
 import React, { useState } from 'react';
 import { TextField, Typography, Select, MenuItem, FormControl, InputLabel, Box, Button, Input } from '@mui/material';
 import { useInputValidation } from "6pp";
+import axios from 'axios';
 
 const Addbooks = () => {
   const title = useInputValidation();
   const author = useInputValidation();
   const type = useInputValidation();
-  const description=useInputValidation();
+  const description = useInputValidation();
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const handleImageChange = (event) => {
+  // const convertBase64 = (file) => {
+  //   return new Promise ((resolve, reject) => {
+  //   const fileReader = new FileReader();
+  //   fileReader.readAsDataURL (file);
+  //   fileReader.onload = () => {
+  //   resolve(fileReader.result);
+  //   }
+  //   fileReader.onerror = (error) => {
+  //   reject(error);
+  //   }
+  //   })}
+
+  const handleImageChange = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      setSelectedImage(URL.createObjectURL(file));
+      // setSelectedImage(URL.createObjectURL(file));
+      // setSelectedImage(file)
+      // const base64 = await convertBase64(file);
+      setSelectedImage(file);
+    }
+  };
+
+  const handleSubmit = async(event) => {
+    event.preventDefault();
+    const bookData = {
+      title: title.value,
+      author: author.value,
+      genre: type.value,
+      description: description.value,
+      bookImage: selectedImage
+    };
+    console.log(bookData);
+    alert(`Book Added: 
+      Title: ${bookData.title}
+      Author: ${bookData.author}`);
+    // Add logic to handle the submission, such as sending data to the backend
+    try {
+      const response = await axios.post(`https://bz95rd6f-5173.inc1.devtunnels.ms/api/books/add-book`,bookData);
+      console.log(response.data)
+    } catch (error) {
+      console.log(error);
     }
   };
 
   return (
     <Box className="container" sx={{ marginTop: '20px', fontFamily: 'cursive' }}>
       <Typography variant="h5" sx={{ marginBottom: '20px', fontFamily: 'cursive' }}>Add New Book</Typography>
-      <form>
+      <form onSubmit={handleSubmit}>
         <TextField
           type="text"
           required
@@ -50,7 +88,7 @@ const Addbooks = () => {
           value={description.value}
           onChange={description.changeHandler}
         />
-        <FormControl variant="outlined" sx={{ width: '30%', marginBottom: '20px' }}>
+        <FormControl variant="outlined" sx={{ width: '30%', marginBottom: '20px' }} onSubmit={handleSubmit}>
           <InputLabel id="book-type-label">Genre</InputLabel>
           <Select
             labelId="book-type-label"
@@ -77,6 +115,9 @@ const Addbooks = () => {
         <Button variant="contained" component="label" sx={{ display: 'block', marginBottom: '20px' }}>
           Upload Book Image
           <Input type="file" accept="image/*" onChange={handleImageChange} hidden />
+        </Button>
+        <Button type="submit" variant="contained" color="primary" sx={{ width: '80%', marginBottom: '20px' }}>
+          Submit
         </Button>
       </form>
     </Box>

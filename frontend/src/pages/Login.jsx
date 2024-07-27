@@ -1,24 +1,17 @@
-import { useFileHandler, useInputValidation } from "6pp";
-import { CameraAlt } from "@mui/icons-material";
-import {
-  Avatar,
-  Button,
-  Container,
-  IconButton,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
 import React, { useState } from "react";
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { setBooksShared, setEmail, setJoinedDate, setName, setUser, setUsername } from '../redux/user/userSlice';
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Avatar, Button, Container, IconButton, Paper, Stack, TextField, Typography } from "@mui/material";
+import { CameraAlt } from "@mui/icons-material";
+import axios from "axios";
+import { useFileHandler, useInputValidation } from "6pp";
+import { setBooksShared, setEmail, setJoinedDate, setName, setUser, setUsername, setCity, setPincode } from "../redux/user/userSlice";
 
 const Login = () => {
   const dispatch = useDispatch();
   const [isLogin, setIsLogin] = useState(true);
   const [passwordError, setPasswordError] = useState("");
+  const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
 
   const toggle = () => setIsLogin(!isLogin);
@@ -27,37 +20,81 @@ const Login = () => {
   const useremail = useInputValidation("");
   const userpassword = useInputValidation("");
   const avatar = useFileHandler("single", 5);
+  const usercity = useInputValidation("");
+  const userpincode = useInputValidation("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (userpassword.value.length < 8) {
-      setPasswordError("Password must be at least 8 characters long.");
-      return;
+    const data = {
+      email: useremail.value,
+      password: userpassword.value,
+    };
+  
+    try {
+      const response = await axios.post(`https://bz95rd6f-5173.inc1.devtunnels.ms/api/auth/login`, data);
+      console.log("Login response: ", response);
+  
+      if (response.data) {
+        dispatch(setName(response.data.user.name));
+        dispatch(setEmail(response.data.user.email));
+        dispatch(setUsername(response.data.user.email));
+        dispatch(setUser(true));
+        dispatch(setJoinedDate(response.data.user.joinedDate));
+        dispatch(setBooksShared(response.data.user.booksShared));
+        dispatch(setCity(response.data.user.city)); // Ensure city is being dispatched
+        dispatch(setPincode(response.data.user.pincode)); // Ensure pincode is being dispatched
+        navigate("/");
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setAuthError(`Error: ${error.response.data.message}`);
+      } else {
+        setAuthError("An unexpected error occurred.");
+        console.log(error);
+      }
     }
     setPasswordError("");
-    dispatch(setName(username.value));
-    dispatch(setEmail(useremail.value));
-    dispatch(setUsername(username.value));
-    dispatch(setUser(true));
-    dispatch(setJoinedDate(new Date().toISOString()));
-    dispatch(setBooksShared(0));
-    navigate('/user');
   };
+  
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    if (userpassword.value.length < 8) {
-      setPasswordError("Password must be at least 8 characters long.");
-      return;
+    const data = {
+      name: username.value,
+      email: useremail.value,
+      password: userpassword.value,
+      city: usercity.value,
+      pincode: userpincode.value,
+    };
+
+    try {
+      const response = await axios.post(`https://bz95rd6f-5173.inc1.devtunnels.ms/api/auth/register`, data);
+      console.log("Signup response: ", response);
+
+      if (response.data) {
+        if (response.data.email) {
+          dispatch(setName(response.data.name));
+          dispatch(setEmail(response.data.email));
+          dispatch(setUsername(response.data.name));
+          dispatch(setUser(true));
+          dispatch(setJoinedDate(response.data.joinedDate));
+          dispatch(setBooksShared(0));
+          dispatch(setCity(response.data.city));
+          dispatch(setPincode(response.data.pincode));
+          navigate("/");
+        } else {
+          alert("User available, please login.");
+          toggle();
+        }
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        alert(`Error: ${error.response.data.message}`);
+      } else {
+        setAuthError("An unexpected error occurred.");
+        console.log(error);
+      }
     }
-    setPasswordError("");
-    dispatch(setName(username.value));
-    dispatch(setEmail(useremail.value));
-    dispatch(setUsername(username.value));
-    dispatch(setUser(true));
-    dispatch(setJoinedDate(new Date().toISOString()));
-    dispatch(setBooksShared(0));
-    navigate('/user');
   };
 
   return (
@@ -69,7 +106,7 @@ const Login = () => {
       }}
     >
       <Container
-        component={"main"}
+        component="main"
         maxWidth="xs"
         sx={{
           height: "100vh",
@@ -91,15 +128,10 @@ const Login = () => {
         >
           {isLogin ? (
             <>
-              <Typography
-                variant="h5"
-                marginTop="20px"
-                sx={{ fontFamily: "cursive" }}
-              >
+              <Typography variant="h5" marginTop="20px" sx={{ fontFamily: "cursive" }}>
                 Login
               </Typography>
               <form
-                component="form"
                 sx={{
                   mt: 2,
                   width: "100%",
@@ -135,24 +167,19 @@ const Login = () => {
                     {passwordError}
                   </Typography>
                 )}
+                {authError && (
+                  <Typography color="error" variant="caption">
+                    {authError}
+                  </Typography>
+                )}
 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                >
+                <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
                   Login
                 </Button>
-                <Typography textAlign={"center"} m="1rem" sx={{ mt: 2 }}>
+                <Typography textAlign="center" m="1rem" sx={{ mt: 2 }}>
                   Or
                 </Typography>
-                <Button
-                  fullWidth
-                  color="secondary"
-                  onClick={toggle}
-                >
+                <Button fullWidth color="secondary" onClick={toggle}>
                   SIGN UP Instead
                 </Button>
               </form>
@@ -160,10 +187,9 @@ const Login = () => {
           ) : (
             <>
               <Typography variant="h5" sx={{ fontFamily: "cursive" }}>
-                Sign Up{" "}
+                Sign Up
               </Typography>
               <form
-                component="form"
                 sx={{
                   width: "100%",
                   display: "flex",
@@ -201,19 +227,15 @@ const Login = () => {
                     component="label"
                   >
                     <CameraAlt />
-                    <input
-                      type="file"
-                      onChange={avatar.changeHandler}
-                      hidden
-                    />
+                    <input type="file" onChange={avatar.changeHandler} hidden />
                   </IconButton>
                 </Stack>
                 {avatar.error && (
                   <Typography
-                    width={"fit-content"}
-                    display={"block"}
-                    margin={"auto"}
-                    marginTop={"1rem"}
+                    width="fit-content"
+                    display="block"
+                    margin="auto"
+                    marginTop="1rem"
                     color="error"
                     variant="caption"
                   >
@@ -236,6 +258,7 @@ const Login = () => {
                   label="Email"
                   margin="normal"
                   variant="outlined"
+                  required
                   fullWidth
                   value={useremail.value}
                   onChange={useremail.changeHandler}
@@ -250,28 +273,43 @@ const Login = () => {
                   value={userpassword.value}
                   onChange={userpassword.changeHandler}
                 />
+                <TextField
+                  type="text"
+                  required
+                  label="City"
+                  margin="normal"
+                  variant="outlined"
+                  fullWidth
+                  value={usercity.value}
+                  onChange={usercity.changeHandler}
+                />
+                <TextField
+                  type="text"
+                  required
+                  label="Pincode"
+                  margin="normal"
+                  variant="outlined"
+                  fullWidth
+                  value={userpincode.value}
+                  onChange={userpincode.changeHandler}
+                />
                 {passwordError && (
                   <Typography color="error" variant="caption">
                     {passwordError}
                   </Typography>
                 )}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  type="submit"
-                  fullWidth
-                  sx={{ mt: 2 }}
-                >
+                {authError && (
+                  <Typography color="error" variant="caption">
+                    {authError}
+                  </Typography>
+                )}
+                <Button variant="contained" color="primary" type="submit" fullWidth sx={{ mt: 2 }}>
                   SIGN UP
                 </Button>
-                <Typography textAlign={"center"} m="1rem" sx={{ mt: 2 }}>
+                <Typography textAlign="center" m="1rem" sx={{ mt: 2 }}>
                   Or
                 </Typography>
-                <Button
-                  fullWidth
-                  color="secondary"
-                  onClick={toggle}
-                >
+                <Button fullWidth color="secondary" onClick={toggle}>
                   LOGIN Instead
                 </Button>
               </form>

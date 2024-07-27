@@ -10,7 +10,7 @@ import NotFound from "./pages/NotFound";
 // Lazy load components
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const User = lazy(() => import("./User"));
+const User = lazy(() => import("./pages/User"));
 
 function App() {
   // Get the user state from the Redux store
