@@ -16,6 +16,9 @@ const bookSchema = new mongoose.Schema({
     description: {
         type: String,
     },
+    bookImage:{
+        type: String,
+    },
     users: [{type:mongoose.Schema.Types.ObjectId,ref:'users'}]
 })
 

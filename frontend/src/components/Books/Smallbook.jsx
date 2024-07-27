@@ -28,7 +28,8 @@ const BookCard = ({ image = logo192, title, author }) => {
         display: 'flex', 
         flexDirection: 'column', 
         borderRadius: '8px',
-        cursor: disabled ? 'not-allowed' : 'pointer' // Change cursor if disabled
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        margin:'20px 10px' // Change cursor if disabled
       }}
       onClick={clickHandler}
     >

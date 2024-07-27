@@ -3,8 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Avatar, Box, Grid, IconButton, Paper, Stack, Typography } from "@mui/material";
 import { CameraAlt, CalendarToday as DateIcon, Email as EmailIcon, Face as UsernameIcon, Book as BookIcon } from "@mui/icons-material";
 import moment from "moment";
-import { setImage } from './redux/user/userSlice'; // Ensure this path is correct
-import Categories from "./components/Books/Categories";
+import { setImage } from '../redux/user/userSlice'; // Ensure this path is correct
+import Categories from "../components/Books/Categories";
+import axios from "axios";
 
 const ProfileCard = ({ text, heading, Icon, sx }) => (
   <Stack direction="row" alignItems="center" spacing={1} sx={{ marginBottom: 1, ...sx }}>
@@ -16,7 +17,7 @@ const ProfileCard = ({ text, heading, Icon, sx }) => (
 
 const User = () => {
   const dispatch = useDispatch();
-  const { name, email, username, joinedDate, booksShared, image } = useSelector((state) => state.user);
+  const { name, email, username, joinedDate, booksShared, image, city, pincode } = useSelector((state) => state.user);
   const [imageUrl, setImageUrl] = useState('');
 
   useEffect(() => {
@@ -124,7 +125,7 @@ const User = () => {
                     borderRadius: "8px",
                   }}
                 />
-                <ProfileCard
+                {/* <ProfileCard
                   text={username}
                   heading="Username"
                   Icon={UsernameIcon}
@@ -133,12 +134,34 @@ const User = () => {
                     padding: "16px",
                     borderRadius: "8px",
                   }}
-                />
+                /> */}
                 <ProfileCard
                   text={email}
                   heading="Email"
                   Icon={EmailIcon}
                   sx={{
+                    fontSize: "1.25rem",
+                    padding: "16px",
+                    borderRadius: "8px",
+                  }}
+                />
+                <ProfileCard
+                  text={city}
+                  heading="City"
+                  // Icon={UsernameIcon}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: "1.25rem",
+                    padding: "16px",
+                    borderRadius: "8px",
+                  }}
+                />
+                <ProfileCard
+                  text={pincode}
+                  heading="Pincode"
+                  // Icon={UsernameIcon}
+                  sx={{
+                    fontWeight: "bold",
                     fontSize: "1.25rem",
                     padding: "16px",
                     borderRadius: "8px",
@@ -154,8 +177,8 @@ const User = () => {
                     borderRadius: "8px",
                   }}
                 />
-                <ProfileCard
-                  text={booksShared.toString()}
+                {/* <ProfileCard
+                  text={booksShared}
                   heading="Book Shared"
                   Icon={BookIcon}
                   sx={{
@@ -164,7 +187,7 @@ const User = () => {
                     padding: "16px",
                     borderRadius: "8px",
                   }}
-                />
+                /> */}
               </Stack>
             </Stack>
           </Paper>
