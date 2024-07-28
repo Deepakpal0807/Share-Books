@@ -8,7 +8,7 @@ const Addbooks = () => {
   const author = useInputValidation();
   const type = useInputValidation();
   const description = useInputValidation();
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState("");
 
   // const convertBase64 = (file) => {
   //   return new Promise ((resolve, reject) => {
@@ -22,13 +22,11 @@ const Addbooks = () => {
   //   }
   //   })}
 
-  const handleImageChange = async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // setSelectedImage(URL.createObjectURL(file));
-      // setSelectedImage(file)
-      // const base64 = await convertBase64(file);
-      setSelectedImage(file);
+  const handleImageChange = (e) => {
+    const image = e.target.files[0];
+    if (image) {
+      // const imageUrl = URL.createObjectURL(image);
+      setSelectedImage(image);
     }
   };
 
@@ -42,13 +40,16 @@ const Addbooks = () => {
       bookImage: selectedImage
     };
     console.log(bookData);
-    alert(`Book Added: 
-      Title: ${bookData.title}
-      Author: ${bookData.author}`);
+
+    // const bookData = new FormData()
+    
     // Add logic to handle the submission, such as sending data to the backend
     try {
-      const response = await axios.post(`https://bz95rd6f-5173.inc1.devtunnels.ms/api/books/add-book`,bookData);
-      console.log(response.data)
+      const response = await axios.post(`http://localhost:5173/api/books/add-book`,bookData);
+      console.log(response)
+      alert(`Book Added: 
+        Title: ${bookData.title}
+        Author: ${bookData.author}`);
     } catch (error) {
       console.log(error);
     }
@@ -57,9 +58,10 @@ const Addbooks = () => {
   return (
     <Box className="container" sx={{ marginTop: '20px', fontFamily: 'cursive' }}>
       <Typography variant="h5" sx={{ marginBottom: '20px', fontFamily: 'cursive' }}>Add New Book</Typography>
-      <form onSubmit={handleSubmit}>
+      <form action='http://localhost:5173/api/books/add-book' method="post" enctype="multipart/form-data">
         <TextField
           type="text"
+          name='title'
           required
           label="Title"
           margin="normal"
@@ -70,6 +72,7 @@ const Addbooks = () => {
         />
         <TextField
           type="text"
+          name='author'
           required
           label="Author"
           margin="normal"
@@ -80,6 +83,7 @@ const Addbooks = () => {
         />
         <TextField
           type="text"
+          name='description'
           required
           label="Description"
           margin="normal"
@@ -93,6 +97,7 @@ const Addbooks = () => {
           <Select
             labelId="book-type-label"
             id="book-type"
+            name='genre'
             required
             value={type.value}
             onChange={type.changeHandler}
@@ -114,7 +119,7 @@ const Addbooks = () => {
         )}
         <Button variant="contained" component="label" sx={{ display: 'block', marginBottom: '20px' }}>
           Upload Book Image
-          <Input type="file" accept="image/*" onChange={handleImageChange} hidden />
+          <Input type="file" accept="image/" name="image" onChange={handleImageChange} hidden />
         </Button>
         <Button type="submit" variant="contained" color="primary" sx={{ width: '80%', marginBottom: '20px' }}>
           Submit

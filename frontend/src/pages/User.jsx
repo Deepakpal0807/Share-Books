@@ -5,7 +5,6 @@ import { CameraAlt, CalendarToday as DateIcon, Email as EmailIcon, Face as Usern
 import moment from "moment";
 import { setImage } from '../redux/user/userSlice'; // Ensure this path is correct
 import Categories from "../components/Books/Categories";
-import axios from "axios";
 
 const ProfileCard = ({ text, heading, Icon, sx }) => (
   <Stack direction="row" alignItems="center" spacing={1} sx={{ marginBottom: 1, ...sx }}>

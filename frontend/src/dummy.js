@@ -11,8 +11,7 @@ const booksData = {
           "The Catcher in the Rye",
           "Sapiens: A Brief History of Humankind",
           "Educated",
-          "Becoming",
-          "The Immortal Life of Henrietta Lacks"
+        
         ]
       },
       {

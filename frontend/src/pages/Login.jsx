@@ -68,7 +68,7 @@ const Login = () => {
     };
 
     try {
-      const response = await axios.post(`https://bz95rd6f-5173.inc1.devtunnels.ms/api/auth/register`, data);
+      const response = await axios.post(`http://localhost:5173/api/auth/register`, data);
       console.log("Signup response: ", response);
 
       if (response.data) {
