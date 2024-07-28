@@ -1,6 +1,8 @@
 import express from 'express';
 import Book from '../models/book.js'
-import upload from '../middlewares/multer.middleware.js';
+// import upload from '../middlewares/multer.middleware.js';
+import multer from 'multer'
+const upload = multer({ dest: './public/data/uploads/' })
 import uploadOnCloudinary from '../utils/cloudinary.js';
 
 const bookRouter = express.Router();
@@ -24,16 +26,11 @@ bookRouter.get('/',async(req,res)=>{
     }
 })
 
-bookRouter.post('/add-book', upload.fields([
-    {
-        name: "bookImage",
-        maxCount: 1
-    },
-]) ,async(req,res) => {
+bookRouter.post('/add-book', upload.single("image") ,async(req,res) => {
     try{
         const {title,author,genre,description} = req.body;
-        // const bookImageLocalPath = req.files?.bookImage?.[0]?.path; 
-        const bookImageLocalPath = req.body.bookImage;  
+        // const bookImageLocalPath = req.file.path;
+        const bookImageLocalPath = req.file.path;
 
         if(!bookImageLocalPath) throw new Error('Book image not uploaded');
 
@@ -46,7 +43,7 @@ bookRouter.post('/add-book', upload.fields([
             author,
             genre,
             description,
-            bookImage
+            bookImage: bookImage.url
         }
 
         const book = await Book.create(data);

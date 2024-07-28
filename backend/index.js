@@ -9,8 +9,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth/',authRouter);
-app.use('/api/books/',bookRouter);
+app.use('/api/auth',authRouter);
+app.use('/api/books',bookRouter);
 
 mongoose.connect(MONGODB_URL)
     .then(()=>{
